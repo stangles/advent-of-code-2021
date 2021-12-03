@@ -3,9 +3,11 @@ package util
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func GetIntInput(filename string) ([]int, error) {
@@ -15,8 +17,7 @@ func GetIntInput(filename string) ([]int, error) {
 	}
 
 	defer func() {
-		err := f.Close()
-		if err != nil {
+		if err := f.Close(); err != nil {
 			log.Printf("failed to close file '%s': %v", filename, err)
 		}
 	}()
@@ -34,4 +35,24 @@ func GetIntInput(filename string) ([]int, error) {
 	}
 
 	return lines, nil
+}
+
+func GetStringInput(filename string) ([]string, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open file '%s': %w", filename, err)
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Printf("failed to close file '%s': %v", filename, err)
+		}
+	}()
+
+	contents, err := io.ReadAll(f)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read contents of file '%s': %w", filename, err)
+	}
+
+	return strings.Split(string(contents), "\n"), nil
 }
