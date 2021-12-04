@@ -54,5 +54,45 @@ func GetStringInput(filename string) ([]string, error) {
 		return nil, fmt.Errorf("unable to read contents of file '%s': %w", filename, err)
 	}
 
-	return strings.Split(string(contents), "\n"), nil
+	lines := strings.Split(string(contents), "\n")
+	if lines[len(lines)-1] == "" {
+		return lines[:len(lines)-1], nil
+	} else {
+		return lines, nil
+	}
+}
+
+func MustInt(ints []int, err error) []int {
+	if err != nil {
+		panic(err)
+	}
+	return ints
+}
+
+func MustString(strings []string, err error) []string {
+	if err != nil {
+		panic(err)
+	}
+	return strings
+}
+
+func BinaryStrToUint16(binaryStrings []string) ([]uint16, error) {
+	nums := make([]uint16, 0)
+	for _, bin := range binaryStrings {
+		num, err := strconv.ParseUint(bin, 2, 16)
+		if err != nil {
+			return nil, fmt.Errorf("unable to convert %s to number: %w", bin, err)
+		}
+
+		nums = append(nums, uint16(num))
+	}
+
+	return nums, nil
+}
+
+func MustBinaryStrToUint16(nums []uint16, err error) []uint16 {
+	if err != nil {
+		panic(err)
+	}
+	return nums
 }

@@ -2,10 +2,21 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/stangles/advent-of-code-2021/aoc"
 )
 
 func main() {
-	fmt.Println(aoc.Day2Part2())
+	ret := withTimings(func() interface{} {
+		return aoc.Day3Part2()
+	})
+	fmt.Println(ret)
+}
+
+func withTimings(f func() interface{}) interface{} {
+	start := time.Now()
+	ret := f()
+	fmt.Println("done in", time.Now().Sub(start))
+	return ret
 }
