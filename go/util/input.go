@@ -2,6 +2,7 @@ package util
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +12,10 @@ import (
 )
 
 func GetIntInput(filename string) ([]int, error) {
+	return GetIntInputWithSplitFunc(filename, bufio.ScanLines)
+}
+
+func GetIntInputWithSplitFunc(filename string, splitFunc bufio.SplitFunc) ([]int, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open file '%s': %w", filename, err)
@@ -24,6 +29,7 @@ func GetIntInput(filename string) ([]int, error) {
 
 	lines := make([]int, 0)
 	scanner := bufio.NewScanner(f)
+	scanner.Split(splitFunc)
 	for scanner.Scan() {
 		text := scanner.Text()
 		next, err := strconv.Atoi(text)
@@ -35,6 +41,13 @@ func GetIntInput(filename string) ([]int, error) {
 	}
 
 	return lines, nil
+}
+
+func MustInt(ints []int, err error) []int {
+	if err != nil {
+		panic(err)
+	}
+	return ints
 }
 
 func GetStringInput(filename string) ([]string, error) {
@@ -62,18 +75,51 @@ func GetStringInput(filename string) ([]string, error) {
 	}
 }
 
-func MustInt(ints []int, err error) []int {
-	if err != nil {
-		panic(err)
-	}
-	return ints
-}
-
 func MustString(strings []string, err error) []string {
 	if err != nil {
 		panic(err)
 	}
 	return strings
+}
+
+func GetBoards(filename string, boardSize int) ([][][]int, error) {
+	input, err := GetStringInput(filename)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get input from '%s': %w", filename, err)
+	}
+
+	boardIdx := 0
+	boards := make([][][]int, 0)
+	boards = append(boards, make([][]int, boardSize))
+	for pos, line := range input {
+		if line == "" {
+			boards = append(boards, make([][]int, boardSize))
+			boardIdx++
+			continue
+		}
+
+		row := pos
+		if pos >= boardSize {
+			row = (pos - boardIdx) % boardSize
+		}
+		boards[boardIdx][row] = make([]int, boardSize)
+		for col, str := range strings.Fields(line) {
+			num, err := strconv.Atoi(str)
+			if err != nil {
+				return nil, fmt.Errorf("unable to convert value in '%s': %w", filename, err)
+			}
+
+			boards[boardIdx][row][col] = num
+		}
+	}
+	return boards, nil
+}
+
+func MustBoard(boards [][][]int, err error) [][][]int {
+	if err != nil {
+		panic(err)
+	}
+	return boards
 }
 
 func BinaryStrToUint16(binaryStrings []string) ([]uint16, error) {
@@ -95,4 +141,19 @@ func MustBinaryStrToUint16(nums []uint16, err error) []uint16 {
 		panic(err)
 	}
 	return nums
+}
+
+func ScanCommaSeparated(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+	if i := bytes.IndexByte(data, ','); i >= 0 {
+		return i + 1, data[0:i], nil
+	}
+	if atEOF {
+		if len(data) > 0 && data[len(data)-1] == '\r' {
+			return len(data), data[0 : len(data)-1], nil
+		}
+	}
+	return 0, nil, nil
 }

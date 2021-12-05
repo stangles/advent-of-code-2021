@@ -63,24 +63,16 @@ func getRating(nums []uint16, o2 bool) uint16 {
 			mask := uint16(math.Pow(2, float64(idx)))
 			bitSet := int((num&mask)>>uint(idx)) == 1
 			if o2 {
-				if countOnes > countZeros && bitSet {
+				if countOnes >= countZeros && bitSet {
 					newCandidates = append(newCandidates, num)
 				} else if countZeros > countOnes && !bitSet {
 					newCandidates = append(newCandidates, num)
-				} else if countOnes == countZeros {
-					if bitSet {
-						newCandidates = append(newCandidates, num)
-					}
 				}
 			} else {
-				if countZeros < countOnes && !bitSet {
+				if countZeros <= countOnes && !bitSet {
 					newCandidates = append(newCandidates, num)
 				} else if countOnes < countZeros && bitSet {
 					newCandidates = append(newCandidates, num)
-				} else if countOnes == countZeros {
-					if !bitSet {
-						newCandidates = append(newCandidates, num)
-					}
 				}
 			}
 		}
