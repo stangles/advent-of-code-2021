@@ -9,7 +9,7 @@ import (
 
 func main() {
 	ret := util.WithTimings(func() interface{} {
-		return aoc.Day6Part2()
+		return aoc.Day7Part1()
 	})
 	fmt.Println(ret)
 }
