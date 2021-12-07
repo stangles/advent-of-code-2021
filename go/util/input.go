@@ -151,7 +151,7 @@ func ScanCommaSeparated(data []byte, atEOF bool) (advance int, token []byte, err
 		return i + 1, data[0:i], nil
 	}
 	if atEOF {
-		if len(data) > 0 && data[len(data)-1] == '\r' {
+		if len(data) > 0 && data[len(data)-1] == '\n' {
 			return len(data), data[0 : len(data)-1], nil
 		}
 	}
